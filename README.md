@@ -129,4 +129,4 @@ process.on("SIGTERM", async () => {
 
 ## License
 
-MIT © devraj-labs
+MIT
