@@ -1,0 +1,49 @@
+{
+  "name": "@devraj-labs/logger",
+  "version": "1.0.0",
+  "description": "Production-grade, platform-independent logging library for JavaScript/TypeScript (React Native + Web)",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "example": "ts-node --project tsconfig.json",
+    "test": "jest",
+    "lint": "eslint src --ext .ts"
+  },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS",
+      "moduleResolution": "node"
+    }
+  },
+  "keywords": [
+    "logger",
+    "logging",
+    "typescript",
+    "react-native",
+    "javascript",
+    "structured-logging",
+    "transport",
+    "devraj-labs"
+  ],
+  "author": "devraj-labs",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  }
+}
