@@ -5,15 +5,17 @@ Works across **React Native**, **Node.js**, and the **browser**.
 
 ---
 
-| Feature                    | @devraj-labs/logger | pino | winston |
-|----------------------------|:-------------------:|:----:|:-------:|
-| Zero dependencies          | ✅                  | ❌   | ❌      |
-| React Native ready         | ✅                  | ⚠️   | ❌      |
-| Singleton (share anywhere) | ✅                  | ❌   | ❌      |
-| Pluggable transports       | ✅                  | ⚠️   | ✅      |
-| Child loggers              | ✅                  | ✅   | ⚠️      |
-| Pretty + JSON output       | ✅                  | ✅   | ✅      |
-| Logger owns zero storage   | ✅                  | ❌   | ❌      |
+- **5 log levels** — `debug`, `info`, `warn`, `error`, `fatal`
+- **Structured logging** — attach any object as metadata to every log
+- **Child loggers** — scope a logger to a module or request, context stamps every line automatically
+- **Pluggable transports** — the logger never stores or sends anything, your transports decide where logs go
+- **Pretty output in dev, JSON in production** — auto-detected, no config needed
+- **Singleton** — one instance shared across your entire app, no passing it around
+- **BatchTransport built-in** — buffer logs and send in one batch instead of one call per line
+- **Per-transport level filtering** — e.g. console shows debug, Sentry only gets errors
+- **Graceful shutdown** — `flush()` ensures buffered logs are sent before the process exits
+- **Zero runtime dependencies**
+- **React Native + Node + browser** — works anywhere
 
 ---
 
