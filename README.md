@@ -1,36 +1,43 @@
-# @devraj-labs/logger
+<div align="center">
 
-Production-grade, platform-independent logging library for JavaScript/TypeScript.  
-Works across **React Native**, **Node.js**, and the **browser**.
+# Logger
 
----
+> Production-grade, platform-independent logging for JavaScript & TypeScript.
+> Works in **React Native**, **Node.js**, and the **browser** — zero runtime dependencies.
 
-- **5 log levels** — `debug`, `info`, `warn`, `error`, `fatal`
-- **Structured logging** — attach any object as metadata to every log
-- **Child loggers** — scope a logger to a module or request, context stamps every line automatically
-- **Pluggable transports** — the logger never stores or sends anything, your transports decide where logs go
-- **Pretty output in dev, JSON in production** — auto-detected, no config needed
-- **Singleton** — one instance shared across your entire app, no passing it around
-- **BatchTransport built-in** — buffer logs and send in one batch instead of one call per line
-- **Per-transport level filtering** — e.g. console shows debug, Sentry only gets errors
-- **Graceful shutdown** — `flush()` ensures buffered logs are sent before the process exits
-- **Zero runtime dependencies**
-- **React Native + Node + browser** — works anywhere
+[![npm version](https://img.shields.io/npm/v/@devraj-labs/logger)](https://www.npmjs.com/package/@devraj-labs/logger)
+[![license](https://img.shields.io/npm/l/@devraj-labs/logger)](./LICENSE)
+[![types](https://img.shields.io/npm/types/@devraj-labs/logger)](https://www.npmjs.com/package/@devraj-labs/logger)
+
+</div>
 
 ---
 
-## Examples
+## Why
 
-| # | What it covers | File |
-|---|---------------|------|
-| 1 | All 5 log levels and what the terminal output looks like | [01-basic-logging.ts](examples/01-basic-logging.ts) |
-| 2 | `setLevel()` — which logs get dropped vs shown | [02-level-filtering.ts](examples/02-level-filtering.ts) |
-| 3 | Child loggers — scoped module name, nested request context | [03-child-logger.ts](examples/03-child-logger.ts) |
-| 4 | Production JSON output format | [04-json-output.ts](examples/04-json-output.ts) |
-| 5 | Writing a custom transport, per-transport `minLevel` | [05-custom-transport.ts](examples/05-custom-transport.ts) |
-| 6 | `BatchTransport` — logs held in memory, sent in one go | [06-batch-transport.ts](examples/06-batch-transport.ts) |
-| 7 | `flush()` — don't lose logs when the process exits | [07-flush-on-shutdown.ts](examples/07-flush-on-shutdown.ts) |
-| 8 | Singleton — sharing the same logger across multiple files | [08-singleton-across-files.ts](examples/08-singleton-across-files.ts) |
+Most loggers are either too simple (no structure, no transports) or too heavy (Node-only, tons of deps). This one is neither.
+
+- Only logs. Never stores. Never sends.
+- Your app decides where logs go via pluggable transports.
+- Same API across React Native, Node, and the browser.
+- Zero runtime dependencies.
+
+---
+
+## Features
+
+| | |
+|---|---|
+| **5 log levels** | `debug` · `info` · `warn` · `error` · `fatal` |
+| **Structured logging** | Attach typed metadata objects to every log entry |
+| **Child loggers** | Scope a logger to a module or request — context stamps every line |
+| **Pluggable transports** | Console, batch, or write your own in ~10 lines |
+| **Smart defaults** | Pretty output in dev, JSON in production — auto-detected |
+| **Singleton** | One instance across your entire app, no prop-drilling |
+| **BatchTransport** | Buffer logs and flush in one batch instead of per-line HTTP calls |
+| **Per-transport level filtering** | Console shows `debug`; Sentry only gets `error` and above |
+| **Graceful shutdown** | `flush()` ensures buffered logs are sent before process exit |
+| **Zero dependencies** | Nothing in `node_modules` that you didn't ask for |
 
 ---
 
@@ -38,70 +45,199 @@ Works across **React Native**, **Node.js**, and the **browser**.
 
 ```bash
 npm install @devraj-labs/logger
+# or
+yarn add @devraj-labs/logger
 ```
 
 ---
 
-## Setup
+## Quick Start
 
-Call `createLogger()` with config **once** at your app's entry point. Everywhere else call it with no args — it returns the same instance.
+```ts
+import { createLogger } from "@devraj-labs/logger";
 
-**Node / Express:**
+// Call once at your app entry point
+const logger = createLogger({ level: "info" });
+
+logger.info("Server started", { port: 3000 });
+logger.warn("Disk usage high", { usedPercent: 91 });
+logger.error("Request failed", { path: "/api/user", statusCode: 500 });
+```
+
+Call `createLogger()` with no arguments anywhere else — it returns the same singleton.
+
+```ts
+// some-other-file.ts
+const logger = createLogger(); // same instance, no config needed
+```
+
+---
+
+## Setup by Platform
+
+**Node / Express**
 ```ts
 // src/index.ts
 const logger = createLogger({ level: "info" });
 ```
 
-**React Native:**
+**React Native**
 ```ts
 // App.tsx
+import { createLogger, ConsoleTransport } from "@devraj-labs/logger";
+
 createLogger({
   level:      __DEV__ ? "debug" : "warn",
   transports: [new ConsoleTransport({ format: __DEV__ ? "pretty" : "json" })],
 });
 ```
 
-**Any other file:**
+---
+
+## Child Loggers
+
+Scope a logger to a module or request. All context fields are stamped on every log line automatically.
+
 ```ts
-const logger = createLogger(); // no args — returns the already-configured singleton
+const logger = createLogger();
+
+// Module-scoped
 const log = logger.child({ module: "AuthService" });
+log.info("Token issued", { userId: "u_123" });
+// → { module: "AuthService", userId: "u_123", message: "Token issued", ... }
+
+// Request-scoped (nest deeper)
+const reqLog = log.child({ requestId: "req_abc" });
+reqLog.debug("Cache miss");
+// → { module: "AuthService", requestId: "req_abc", message: "Cache miss", ... }
 ```
 
 ---
 
 ## Log Levels
 
-| Level   | When to use |
-|---------|-------------|
-| `debug` | Internal details — DB queries, state changes |
-| `info`  | Normal events — server started, user logged in |
-| `warn`  | Something looks wrong but app is still running |
-| `error` | A request or operation failed |
-| `fatal` | App is about to crash |
+```ts
+logger.debug("DB query", { sql: "SELECT ..." });   // internal details
+logger.info("User signed in", { userId: "u_1" });  // normal events
+logger.warn("Rate limit approaching", { pct: 80 }); // degraded but alive
+logger.error("Payment failed", { orderId: "o_9" }); // operation failed
+logger.fatal("Out of memory");                       // app about to crash
+```
+
+| Level   | Numeric | When to use |
+|---------|---------|-------------|
+| `debug` | 0 | Internal details — queries, state changes |
+| `info`  | 1 | Normal events — server started, user logged in |
+| `warn`  | 2 | Something looks wrong but app is still running |
+| `error` | 3 | A request or operation failed |
+| `fatal` | 4 | App is about to crash |
+| `silent`| 5 | Disables all output |
+
+Change the level at runtime:
+
+```ts
+logger.setLevel("warn"); // drop debug + info from here on
+```
 
 ---
 
-## Transports — Where Logs Go
+## Transports
 
-The logger never stores or sends anything itself. You plug in transports that decide what happens to each log entry.
+The logger never stores or sends anything itself. Transports decide what happens to each log entry.
 
 ```
-Your Code  →  Logger (level filter)  →  ConsoleTransport   (prints to terminal)
-                                     →  BatchTransport      (buffers → POST to server)
-                                     →  YourTransport       (AsyncStorage / Sentry / anything)
+Your Code → Logger (level gate) → ConsoleTransport   (prints to terminal)
+                                → BatchTransport      (buffers → POST to server)
+                                → YourCustomTransport (AsyncStorage / Sentry / file / anything)
 ```
 
-**`ConsoleTransport`** — added automatically if you don't specify any transports.  
-**`BatchTransport`** — holds logs in memory and sends them in one batch. Avoids one HTTP call per log line.  
-**Custom transport** — implement `{ name, log(entry) }`. See [example 5](examples/05-custom-transport.ts).
+### ConsoleTransport
 
-### `flush()` — call on shutdown
+Added automatically if you don't specify any transports. Prints pretty output in dev, JSON in production.
 
-If `BatchTransport` has unsent logs when the process exits, they're lost. `flush()` forces everything out immediately.
+```ts
+import { ConsoleTransport } from "@devraj-labs/logger";
+
+createLogger({
+  transports: [
+    new ConsoleTransport({ format: "pretty" }), // or "json" | "auto"
+  ],
+});
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `format` | `"pretty" \| "json" \| "auto"` | `"auto"` | Output format. `"auto"` picks pretty in dev, JSON in production |
+| `fatalMethod` | `"error" \| "warn" \| "log"` | `"error"` | Which `console` method is used for `fatal` entries |
+
+### BatchTransport
+
+Buffers logs in memory and sends them in one batch. Avoids one HTTP call per log line.
+
+```ts
+import { BatchTransport } from "@devraj-labs/logger";
+
+createLogger({
+  transports: [
+    new BatchTransport({
+      sendBatch: async (entries) => {
+        await fetch("/api/logs", {
+          method: "POST",
+          body: JSON.stringify(entries),
+        });
+      },
+      maxBatchSize: 50,
+      flushIntervalMs: 5000,
+    }),
+  ],
+});
+```
+
+### Custom Transport
+
+Implement `{ name, log(entry) }` — that's the whole interface.
+
+```ts
+import { Transport, LogEntry } from "@devraj-labs/logger";
+
+class SentryTransport implements Transport {
+  name = "sentry";
+  minLevel = LogLevel.ERROR; // only errors and above
+
+  log(entry: LogEntry): void {
+    Sentry.captureMessage(entry.message, {
+      level: entry.levelName,
+      extra: entry.meta,
+    });
+  }
+}
+
+createLogger({
+  transports: [new ConsoleTransport(), new SentryTransport()],
+});
+```
+
+### Per-transport level filtering
+
+```ts
+createLogger({
+  level: "debug", // root logger emits everything
+  transports: [
+    new ConsoleTransport(),                              // sees all levels
+    new SentryTransport({ minLevel: LogLevel.ERROR }),   // only errors+
+  ],
+});
+```
+
+---
+
+## Graceful Shutdown
+
+If `BatchTransport` holds unsent logs when the process exits, they're lost. Call `flush()` before exiting.
 
 ```ts
 process.on("SIGTERM", async () => {
-  await logger.flush();
+  await logger.flush(); // drains all transport buffers
   process.exit(0);
 });
 ```
@@ -110,23 +246,63 @@ process.on("SIGTERM", async () => {
 
 ## Environment Defaults
 
-| `NODE_ENV`    | Default level | Console format  |
-|---------------|---------------|-----------------|
-| `development` | `debug`       | pretty (colours)|
-| `production`  | `warn`        | json            |
-| unset         | `debug`       | pretty          |
+| `NODE_ENV`    | Default level | Console format   |
+|---------------|---------------|------------------|
+| `development` | `debug`       | pretty (colours) |
+| `production`  | `warn`        | JSON             |
+| unset         | `debug`       | pretty           |
+
+Override at any time:
+
+```ts
+createLogger({ level: "info", forceJsonOutput: true });
+```
 
 ---
 
-## Why
+## API Reference
 
-- Only logs. Never stores. Never sends.
-- Your app decides where logs go via transports.
-- Works the same across React Native, Node, and the browser.
-- Zero runtime dependencies.
+### `createLogger(config?)`
+
+Returns the singleton `Logger`. Config only applies on the **first** call.
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `level` | `LogLevelName` | env-detected | Minimum level to emit |
+| `transports` | `Transport[]` | `[ConsoleTransport]` | Active transports |
+| `context` | `LogContext` | `{}` | Global context merged into every entry |
+| `forceJsonOutput` | `boolean` | `false` | Force JSON format regardless of env |
+
+### `Logger`
+
+| Method | Description |
+|--------|-------------|
+| `debug / info / warn / error / fatal(msg, meta?)` | Emit a log entry |
+| `child(context)` | Create a scoped child logger |
+| `setLevel(level)` | Change minimum level at runtime |
+| `getLevel()` | Returns current level name |
+| `addTransport(transport)` | Register a transport |
+| `removeTransport(name)` | Remove a transport by name (calls `flush`) |
+| `setContext(context)` | Merge context into root logger |
+| `flush()` | Drain all transport buffers |
+
+---
+
+## Examples
+
+| # | What it covers | File |
+|---|----------------|------|
+| 1 | All 5 log levels and terminal output | [01-basic-logging.ts](examples/01-basic-logging.ts) |
+| 2 | `setLevel()` — which logs are dropped vs shown | [02-level-filtering.ts](examples/02-level-filtering.ts) |
+| 3 | Child loggers — module name, nested request context | [03-child-logger.ts](examples/03-child-logger.ts) |
+| 4 | Production JSON output format | [04-json-output.ts](examples/04-json-output.ts) |
+| 5 | Writing a custom transport, per-transport `minLevel` | [05-custom-transport.ts](examples/05-custom-transport.ts) |
+| 6 | `BatchTransport` — buffer logs, send in one go | [06-batch-transport.ts](examples/06-batch-transport.ts) |
+| 7 | `flush()` — don't lose logs on process exit | [07-flush-on-shutdown.ts](examples/07-flush-on-shutdown.ts) |
+| 8 | Singleton — sharing one logger across multiple files | [08-singleton-across-files.ts](examples/08-singleton-across-files.ts) |
 
 ---
 
 ## License
 
-MIT
+[MIT](./LICENSE) © [devraj-labs](https://github.com/devraj-labs)
