@@ -5,9 +5,9 @@
 > Production-grade, platform-independent logging for JavaScript & TypeScript.
 > Works in **React Native**, **Node.js**, and the **browser** — zero runtime dependencies.
 
-[![npm version](https://img.shields.io/npm/v/@devraj-labs/logger)](https://www.npmjs.com/package/@devraj-labs/logger)
-[![license](https://img.shields.io/npm/l/@devraj-labs/logger)](./LICENSE)
-[![types](https://img.shields.io/npm/types/@devraj-labs/logger)](https://www.npmjs.com/package/@devraj-labs/logger)
+[![npm version](https://img.shields.io/npm/v/@88khp/logger)](https://www.npmjs.com/package/@88khp/logger)
+[![license](https://img.shields.io/npm/l/@88khp/logger)](./LICENSE)
+[![types](https://img.shields.io/npm/types/@88khp/logger)](https://www.npmjs.com/package/@88khp/logger)
 
 </div>
 
@@ -44,9 +44,9 @@ Most loggers are either too simple (no structure, no transports) or too heavy (N
 ## Install
 
 ```bash
-npm install @devraj-labs/logger
+npm install @88khp/logger
 # or
-yarn add @devraj-labs/logger
+yarn add @88khp/logger
 ```
 
 ---
@@ -54,7 +54,7 @@ yarn add @devraj-labs/logger
 ## Quick Start
 
 ```ts
-import { createLogger } from "@devraj-labs/logger";
+import { createLogger } from "@88khp/logger";
 
 // Call once at your app entry point
 const logger = createLogger({ level: "info" });
@@ -84,7 +84,7 @@ const logger = createLogger({ level: "info" });
 **React Native**
 ```ts
 // App.tsx
-import { createLogger, ConsoleTransport } from "@devraj-labs/logger";
+import { createLogger, ConsoleTransport } from "@88khp/logger";
 
 createLogger({
   level:      __DEV__ ? "debug" : "warn",
@@ -156,7 +156,7 @@ Your Code → Logger (level gate) → ConsoleTransport   (prints to terminal)
 Added automatically if you don't specify any transports. Prints pretty output in dev, JSON in production.
 
 ```ts
-import { ConsoleTransport } from "@devraj-labs/logger";
+import { ConsoleTransport } from "@88khp/logger";
 
 createLogger({
   transports: [
@@ -175,7 +175,7 @@ createLogger({
 Buffers logs in memory and sends them in one batch. Avoids one HTTP call per log line.
 
 ```ts
-import { BatchTransport } from "@devraj-labs/logger";
+import { BatchTransport } from "@88khp/logger";
 
 createLogger({
   transports: [
@@ -198,7 +198,7 @@ createLogger({
 Implement `{ name, log(entry) }` — that's the whole interface.
 
 ```ts
-import { Transport, LogEntry } from "@devraj-labs/logger";
+import { Transport, LogEntry } from "@88khp/logger";
 
 class SentryTransport implements Transport {
   name = "sentry";
@@ -305,4 +305,4 @@ Returns the singleton `Logger`. Config only applies on the **first** call.
 
 ## License
 
-[MIT](./LICENSE) © [devraj-labs](https://github.com/devraj-labs)
+[MIT](./LICENSE) © [88khp](https://github.com/88khp)

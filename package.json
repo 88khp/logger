@@ -1,5 +1,5 @@
 {
-  "name": "@devraj-labs/logger",
+  "name": "@88khp/logger",
   "version": "1.0.0",
   "description": "Production-grade, platform-independent logging library for JavaScript/TypeScript (React Native + Web)",
   "main": "dist/index.js",
@@ -36,20 +36,20 @@
     "javascript",
     "structured-logging",
     "transport",
-    "devraj-labs"
+    "88khp"
   ],
-  "homepage": "https://github.com/devraj-labs/logger",
+  "homepage": "https://github.com/88khp/logger",
   "repository": {
     "type": "git",
-    "url": "https://github.com/devraj-labs/logger.git"
+    "url": "https://github.com/88khp/logger.git"
   },
   "bugs": {
-    "url": "https://github.com/devraj-labs/logger/issues"
+    "url": "https://github.com/88khp/logger/issues"
   },
   "engines": {
     "node": ">=16"
   },
-  "author": "devraj-labs",
+  "author": "88khp",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.0.0",
