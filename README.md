@@ -13,6 +13,29 @@
 
 ---
 
+## Is it for you?
+
+### Why use it
+
+- You want structured logs that work the same in React Native, Node.js and the browser.
+- You want to send logs wherever you like through transports, with no runtime dependencies.
+
+### The problem it solves
+
+Most loggers are either too simple, with no structure or transports, or too heavy and Node-only. This one has typed metadata, child loggers, and pluggable transports, and it works in all three environments.
+
+### Who it's not for
+
+- Teams that want a hosted log service out of the box. Write a transport for the service you use.
+- Projects that need the logger to store logs for you. It doesn't store logs.
+
+### What it doesn't do
+
+- It doesn't store or send logs by itself. Your transports decide where logs go.
+- It doesn't collect crash reports or metrics.
+
+---
+
 ## Why
 
 Most loggers are either too simple (no structure, no transports) or too heavy (Node-only, tons of deps). This one is neither.
